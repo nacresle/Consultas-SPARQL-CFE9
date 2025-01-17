@@ -1,4 +1,4 @@
-#Consulta 6. Parcelas regulares (con 2 o menos clases diamétricas asociadas a una especie específica)
+#Consulta 6. Parcelas regulares en Asturias (33) (con 2 o menos clases diamétricas asociadas a una especie específica)
 
 SELECT DISTINCT ?plot3 ?lat ?lng COUNT(?DC) AS ?nDC
 WHERE {
