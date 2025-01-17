@@ -1,6 +1,6 @@
 #Consulta 3. Diferencia en Volumen entre IFN2 e IFN3 en las especies del País Vasco 
 
-#Media incremento en volumen por especie
+#Media incremento en volumen por especie 
 SELECT ?prov ?name3 (AVG(?VCC3 - ?VCC2) AS ?AvgIncreVCC)
 WHERE {
   # Filtrar provincias específicas
@@ -43,7 +43,7 @@ ORDER BY ?prov DESC(?AvgIncreVCC)
 
 ##############################################################################################################################################3
 
-#Contar el número de veces que se repite una especie
+#Contar el número de veces que se repite una especie con un incremento de volumen entre inventarios de >100 m3/ha
 SELECT ?name2 (COUNT(?name2) AS ?count)
 WHERE {
   # Filtrar provincias específicas
