@@ -1,4 +1,4 @@
-# Consulta 5. Consulta para obtener parcelas mixtas, donde ninguna especie domina el 90% o más del área basal,
+# Consulta 5. Consulta para obtener parcelas mixtas en Asturias (33), donde ninguna especie domina el 90% o más del área basal,
 # pero al menos una especie tiene un porcentaje de área basal entre el 15% y el 90%.
 
 
