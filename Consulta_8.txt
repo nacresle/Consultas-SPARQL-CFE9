@@ -1,6 +1,6 @@
 #Consulta 7. Consulta para identificar municipios y parcelas con árboles de mejor calidad (calidad 1 y 2) en Asturias (33).
 
-SELECT DISTINCT ?muni ?plot3 ?lng ?lat (COUNT(?treeS) AS ?Sano)
+SELECT DISTINCT ?muni ?plot3 ?lng ?lat (COUNT(?treeS) AS ?NCalidad)
 WHERE {
   # Filtrar por provincias específicas.
   VALUES ?prov {
@@ -27,7 +27,7 @@ WHERE {
          rdf:type ?sp ;
          rdf:type ?calidad .
 
-  # Filtrar árboles de calidad sana (Quality1 y Quality2).
+  # Filtrar árboles de calidad (Quality1 y Quality2).
   FILTER (?calidad IN (<https://datos.iepnb.es/kos/sector-publico/medio-ambiente/ifn3/treeQuality/Quality1>, 
                        <https://datos.iepnb.es/kos/sector-publico/medio-ambiente/ifn3/treeQuality/Quality2>))
 }
@@ -35,4 +35,4 @@ WHERE {
 GROUP BY ?plot3 ?muni ?lng ?lat 
 
 # Ordenar resultados por municipio.
-ORDER BY ?muni ?Sano
+ORDER BY ?muni ?NCalidad
