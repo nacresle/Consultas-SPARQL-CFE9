@@ -1,0 +1,38 @@
+#Consulta 9. Caracteristicas del subpiso de matorral
+
+SELECT ?spM (COUNT(?plot3) AS ?countPlots)
+WHERE {
+  # Especificar la especie de interés. En este caso, Eucalyptus globulus tiene el código 61 en el IFN3.
+  # Para Pinus pinaster, se usaría el IRI correspondiente a Species28.
+  VALUES ?sp {<https://datos.iepnb.es/kos/sector-publico/medio-ambiente/ifn3/taxon/Species61>}
+  # Parcela y posición geográfica
+  ?plot3 a <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/Plot> ;
+         <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/containsSpecies> ?existencias ;
+		  <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/containsSpecies> ?existencias2 .
+   ?existencias2 <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/hasSpecies>  ?sp;
+                 <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/hasBasalAreaInM2byHA>  ?spBasalArea  .
+
+  # Datos de especies y FCC de matorral
+  ?existencias <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/hasSpecies> ?spM ;
+               <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/hasAverageHeight> ?Hm ;
+               <https://datos.iepnb.es/def/sector-publico/medio-ambiente/mfe50/hasCanopyCoverBushesPercent> ?FCCm .
+  
+  # Calcular la suma de FCC por parcela
+  {
+    SELECT ?plot3 (SUM(?FCCm) AS ?TotalFCCm)
+    WHERE {
+      ?plot3 a <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/Plot> ;
+	          <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/province> <https://datos.iepnb.es/recurso/sector-publico/medio-ambiente/ifn3/province/province33> ;
+             <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/containsSpecies> ?existencias .
+      ?existencias <https://datos.iepnb.es/def/sector-publico/medio-ambiente/mfe50/hasCanopyCoverBushesPercent> ?FCCm .
+    }
+	#Filtrar solo parcelas que tengan una FCC del matorral mayor al 50%
+    GROUP BY ?plot3
+    HAVING (SUM(?FCCm) >= 50)
+  }
+
+  # Vincular con las parcelas filtradas
+  FILTER (?plot3 IN (?plot3))
+}
+GROUP BY ?spM
+ORDER BY DESC(?countPlots)

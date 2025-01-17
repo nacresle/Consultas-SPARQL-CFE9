@@ -1,0 +1,46 @@
+Consulta 4. Consulta para obtener parcelas puras, aquellas donde una sola especie domina el 90% o más del área basal.
+
+SELECT DISTINCT ?plot3 ?lat ?lng ?nameSp (100*?spBasalArea)/SUM(?G) AS ?PorG
+WHERE {
+  # Selecciona parcelas de IFN3 que contienen especies y están en un municipio específico.
+  ?plot3 a <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/Plot> ;
+         <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/containsSpecies> ?existencias ;
+         <http://crossforest.eu/position/ontology/hasPosition> ?pos .
+
+  # Obtiene la posición geográfica WGS84 (latitud y longitud) de la parcela.
+  ?pos <http://crossforest.eu/position/ontology/hasCoordinateReferenceSystem> <http://epsg.w3id.org/data/coordinateReferenceSystem/crs4326> ;
+       <http://epsg.w3id.org/ontology/coordinateAxis/axis106> ?lat ;
+       <http://epsg.w3id.org/ontology/coordinateAxis/axis107> ?lng .
+
+  # Recupera el área basal total de las especies en la parcela.
+  ?existencias <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/hasBasalAreaInM2byHA> ?G .
+
+  # Subconsulta: Filtra las parcelas en una provincia específica (province33) y calcula el área basal por especie.
+  {
+     SELECT ?plot3 ?nameSp ?spBasalArea 
+     WHERE {
+	     #Indicar la especie que nos interesa (en este caso Eucalyptus globulus tiene el código 61 en el IFN3)
+         #Para Pinus pinaster seria <https://datos.iepnb.es/kos/sector-publico/medio-ambiente/ifn3/taxon/Species28>
+         VALUES ?sp {<https://datos.iepnb.es/kos/sector-publico/medio-ambiente/ifn3/taxon/Species61>}
+         # Selecciona parcelas que contienen especies en la provincia indicada.
+         ?plot3 a <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/Plot> ;
+                <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/province> <https://datos.iepnb.es/recurso/sector-publico/medio-ambiente/ifn3/province/province33>;
+                <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/containsSpecies> ?existencias .
+
+         # Obtiene las especies y sus áreas basales específicas.
+         ?existencias <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/hasSpecies> ?sp ;
+                      <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/hasBasalAreaInM2byHA> ?spBasalArea .
+
+         # Recupera el nombre aceptado de la especie sin el autor.
+         ?sp <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/acceptedNameWithoutAuthor> ?nameSp .
+     }
+  }
+}
+# Agrupa los resultados por parcela, coordenadas, nombre de especie y área basal de la especie.
+GROUP BY ?plot3 ?lat ?lng ?nameSp ?spBasalArea
+
+# Filtra las parcelas donde la especie dominante tiene al menos el 90% del área basal total.
+HAVING ((100*?spBasalArea)/SUM(?G) >= 90)
+
+# Ordena los resultados por parcela.
+ORDER BY ?plot3

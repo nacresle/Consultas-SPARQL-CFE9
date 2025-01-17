@@ -1,0 +1,38 @@
+#Consulta 7. Consulta para identificar municipios y parcelas con árboles de mejor calidad (calidad 1 y 2) en una provincia y especie específica.
+
+SELECT DISTINCT ?muni ?plot3 ?lng ?lat (COUNT(?treeS) AS ?Sano)
+WHERE {
+  # Filtrar por provincias específicas.
+  VALUES ?prov {
+    <https://datos.iepnb.es/recurso/sector-publico/medio-ambiente/ifn3/province/province33>
+  }
+
+  # Especificar la especie de interés.
+  # Eucalyptus globulus tiene el código 61 en el IFN3. Para Pinus pinaster, usar el IRI de Species28.
+  VALUES ?sp {<https://datos.iepnb.es/kos/sector-publico/medio-ambiente/ifn3/taxon/Species61>}
+
+  # Obtener parcelas en la provincia seleccionada y su posición geográfica.
+  ?plot3 a <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/Plot> ;
+         <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/province> ?prov ;
+         <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/isInMunicipality> ?muni ;
+         <http://crossforest.eu/position/ontology/hasPosition> ?pos .
+
+  # Extraer las coordenadas geográficas de cada parcela.
+  ?pos <http://crossforest.eu/position/ontology/hasCoordinateReferenceSystem> <http://epsg.w3id.org/data/coordinateReferenceSystem/crs4326> ;
+       <http://epsg.w3id.org/ontology/coordinateAxis/axis106> ?lat ;
+       <http://epsg.w3id.org/ontology/coordinateAxis/axis107> ?lng .
+
+  # Árboles asociados a la parcela, de la especie y calidad especificadas.
+  ?treeS <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/isInPlot> ?plot3 ;
+         rdf:type ?sp ;
+         rdf:type ?calidad .
+
+  # Filtrar árboles de calidad sana (Quality1 y Quality2).
+  FILTER (?calidad IN (<https://datos.iepnb.es/kos/sector-publico/medio-ambiente/ifn3/treeQuality/Quality1>, 
+                       <https://datos.iepnb.es/kos/sector-publico/medio-ambiente/ifn3/treeQuality/Quality2>))
+}
+# Agrupar resultados por parcela, municipio y coordenadas.
+GROUP BY ?plot3 ?muni ?lng ?lat 
+
+# Ordenar resultados por municipio.
+ORDER BY ?muni ?Sano

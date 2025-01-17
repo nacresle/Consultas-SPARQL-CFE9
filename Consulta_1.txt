@@ -1,0 +1,62 @@
+#Consulta 1. Daños en Pinus radiata en País Vasco
+
+SELECT DISTINCT ?plot3 
+                ?lat ?lng
+                (COUNT(DISTINCT ?treeT) AS ?TotalTrees) 
+                (COUNT(DISTINCT ?treePR) AS ?TotalPR) 
+                (COUNT(DISTINCT ?treeD) AS ?TotalDamage) 
+                ?agent 
+                ?importance
+                (COUNT(DISTINCT ?treeD) * 100.0 / COUNT(DISTINCT ?treeT) AS ?DamagePercentage)
+WHERE {
+  # Filtrar provincias específicas
+  VALUES ?prov {
+    <https://datos.iepnb.es/recurso/sector-publico/medio-ambiente/ifn3/province/province1> 
+    <https://datos.iepnb.es/recurso/sector-publico/medio-ambiente/ifn3/province/province20> 
+    <https://datos.iepnb.es/recurso/sector-publico/medio-ambiente/ifn3/province/province48>
+  }
+
+  # Parcela y posición geográfica
+  ?plot3 a <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/Plot> ;
+         <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/province> ?prov ;
+         <http://crossforest.eu/position/ontology/hasPosition> ?pos .
+
+  ?pos <http://crossforest.eu/position/ontology/hasCoordinateReferenceSystem> <http://epsg.w3id.org/data/coordinateReferenceSystem/crs4326> ;
+       <http://epsg.w3id.org/ontology/coordinateAxis/axis106> ?lat ;
+       <http://epsg.w3id.org/ontology/coordinateAxis/axis107> ?lng .
+
+  # Árboles con daño
+  ?treeD <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/isInPlot> ?plot3 ;
+         rdf:type <https://datos.iepnb.es/kos/sector-publico/medio-ambiente/ifn3/taxon/Species28> ;
+         <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/hasDamageStatus> ?damage .
+
+  # Árboles de la parcela con especie principal
+  ?treePR <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/isInPlot> ?plot3 ;
+          rdf:type <https://datos.iepnb.es/kos/sector-publico/medio-ambiente/ifn3/taxon/Species28> .
+
+  # Total de árboles de la parcela
+  ?treeT <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/isInPlot> ?plot3 .
+
+  # Información del daño
+  ?damage <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/hasDamageAgent> ?agent ;
+          <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/hasDamageImportance> ?importance .
+
+  # Filtrar agentes de daño específicos
+  FILTER (?agent IN (
+    <https://datos.iepnb.es/kos/sector-publico/medio-ambiente/ifn3/treeDamageAgent/agent310>,
+    <https://datos.iepnb.es/kos/sector-publico/medio-ambiente/ifn3/treeDamageAgent/agent311>,
+    <https://datos.iepnb.es/kos/sector-publico/medio-ambiente/ifn3/treeDamageAgent/agent421>
+  ))
+}
+
+# Agrupar por parcela y agente
+GROUP BY ?plot3 ?lat ?lng ?agent ?importance
+
+# Filtrar por porcentaje de daño y pureza
+HAVING (
+  (COUNT(DISTINCT ?treeD) * 100.0 / COUNT(DISTINCT ?treeT)) >= 10 &&  # Daño >= 10%
+  (COUNT(DISTINCT ?treeT)) >= 10    # Mínimo de árboles en la parcela >= 10%
+)
+
+# Ordenar por parcela y agente
+ORDER BY ?plot3 ?agent ?importance

@@ -1,0 +1,48 @@
+#Consulta 2. Caracteristicas de las parcelas con daños en Pinus radiata en País Vasco
+
+SELECT DISTINCT 
+    ?plot3          # Parcela del IFN3
+    ?lat ?lng       # Coordenadas de la parcela
+    ?penOri         # Pendiente del terreno
+    ?altitud        # Altitud de la parcela
+    ?pedre          # Nivel de pedregosidad
+    ?desarrollo     # Nivel de desarrollo de la vegetación
+    ?spVCC          # Volumen con corteza por hectárea para la especie específica
+WHERE {
+  # Filtrar provincias específicas
+  VALUES ?prov {
+    <https://datos.iepnb.es/recurso/sector-publico/medio-ambiente/ifn3/province/province1> 
+    <https://datos.iepnb.es/recurso/sector-publico/medio-ambiente/ifn3/province/province20> 
+    <https://datos.iepnb.es/recurso/sector-publico/medio-ambiente/ifn3/province/province48>
+  }
+  # Parcela y posición geográfica
+  ?plot3 a <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/Plot> ; # Parcela del IFN3
+         <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/containsSpecies> ?contains ; # Relación con especies
+         <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/containsSpecies> ?contains2 ; 
+         <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/province> ?prov ; # Relación con la provincia
+         <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/inPatch> ?tesela ; # Relación con la tesela del MFE50
+         rdf:type ?pedre ; # Tipo de pedregosidad
+         <http://crossforest.eu/position/ontology/hasPosition> ?pos. # Relación con la posición geográfica
+
+  # Datos opcionales sobre pendiente y altitud (porque no hay en todas las provincias)
+  OPTIONAL {?plot3 <http://crossforest.eu/terrain/ontology/hasSlope> ?penOri } 
+  OPTIONAL {?plot3 <http://crossforest.eu/terrain/ontology/hasAltitudeInMeters> ?altitud }
+
+  # Coordenadas de la parcela
+  ?pos <http://crossforest.eu/position/ontology/hasCoordinateReferenceSystem> <http://epsg.w3id.org/data/coordinateReferenceSystem/crs4326> ;
+       <http://epsg.w3id.org/ontology/coordinateAxis/axis106> ?lat ;
+       <http://epsg.w3id.org/ontology/coordinateAxis/axis107> ?lng .
+
+  # Relación con las especies y sus datos
+  ?contains <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/hasSpecies> <https://datos.iepnb.es/kos/sector-publico/medio-ambiente/ifn3/taxon/Species28> ; # Especie específica
+            <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/hasStandDevelopment> ?desarrollo .
+  ?contains2 <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/hasSpecies>    				        <https://datos.iepnb.es/kos/sector-publico/medio-ambiente/ifn3/taxon/Species28> ;
+  <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/hasVolumeWithBarkInM3byHA>  ?spVCC. 
+
+  # Filtro para especificar los niveles de pedregosidad
+  FILTER (?pedre IN (<https://datos.iepnb.es/kos/sector-publico/medio-ambiente/ifn3/rocosity/Rocosity1> ,
+                     <https://datos.iepnb.es/kos/sector-publico/medio-ambiente/ifn3/rocosity/Rocosity2> ,
+                     <https://datos.iepnb.es/kos/sector-publico/medio-ambiente/ifn3/rocosity/Rocosity3> ,
+                     <https://datos.iepnb.es/kos/sector-publico/medio-ambiente/ifn3/rocosity/Rocosity4>))
+}
+ORDER BY ?plot3

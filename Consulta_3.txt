@@ -1,0 +1,84 @@
+#Consulta 3. Diferencia en Volumen entre IFN2 e IFN3 en las especies del País Vasco 
+
+#Media incremento en volumen por especie
+SELECT ?prov ?name3 (AVG(?VCC3 - ?VCC2) AS ?AvgIncreVCC)
+WHERE {
+  # Filtrar provincias específicas
+  VALUES ?prov {
+    <https://datos.iepnb.es/recurso/sector-publico/medio-ambiente/ifn3/province/province1> 
+    <https://datos.iepnb.es/recurso/sector-publico/medio-ambiente/ifn3/province/province20> 
+    <https://datos.iepnb.es/recurso/sector-publico/medio-ambiente/ifn3/province/province48>
+  }
+  ?plot3 a <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/Plot> ;
+         <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/containsSpecies> ?contains3 ;
+		  <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/province> ?prov ;
+		  <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/containsSpecies> ?containsES ;
+		 <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/previousPlot> ?plot2 .
+  ?contains3 <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/hasSpecies> ?sp3 ;  
+             <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/hasVolumeWithBarkInM3byHA> ?VCC3 .
+  ?containsES <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/hasSpecies> ?sp3 ; # Especie específica
+            <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/hasStandDevelopment> ?desarrollo .
+  
+  ?plot2 <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn2/containsSpecies> ?contains2 .
+  
+  ?contains2 <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn2/hasSpecies> ?sp2 ;  
+             <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn2/hasVolumeWithBarkInM3byHA> ?VCC2 .
+
+  ?sp3 <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/acceptedNameWithoutAuthor> ?name3 .
+  ?sp2 <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn2/acceptedNameWithoutAuthor> ?name2 .
+
+  # Filtrar para la diferencia de volumen mayor a 100 m3/ha en estos 9 años
+  FILTER ((?VCC3 - ?VCC2) > 100)
+
+  # Asegurarse de que las especies sean iguales
+  FILTER (?name2 = ?name3)
+  
+   # Asegurarse de que las especies sean iguales
+   FILTER (?desarrollo = <https://datos.iepnb.es/kos/sector-publico/medio-ambiente/ifn3/standDevelopment/state4>)
+
+  # Excluir la especie "Pinus radiata"
+  # FILTER (?name2 != "Pinus radiata" && ?name3 != "Pinus radiata")
+}
+ORDER BY ?prov DESC(?AvgIncreVCC)
+
+##############################################################################################################################################3
+
+#Contar el número de veces que se repite una especie
+SELECT ?name2 (COUNT(?name2) AS ?count)
+WHERE {
+  # Filtrar provincias específicas
+  VALUES ?prov {
+    <https://datos.iepnb.es/recurso/sector-publico/medio-ambiente/ifn3/province/province1> 
+    <https://datos.iepnb.es/recurso/sector-publico/medio-ambiente/ifn3/province/province20> 
+    <https://datos.iepnb.es/recurso/sector-publico/medio-ambiente/ifn3/province/province48>
+  }
+  ?plot3 a <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/Plot> ;
+         <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/containsSpecies> ?contains3 ;
+		  <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/province> ?prov ;
+		  <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/containsSpecies> ?containsES ;
+		 <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/previousPlot> ?plot2 .
+  ?contains3 <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/hasSpecies> ?sp3 ;  
+             <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/hasVolumeWithBarkInM3byHA> ?VCC3 .
+  ?containsES <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/hasSpecies> ?sp3 ; # Especie específica
+            <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/hasStandDevelopment> ?desarrollo .
+  
+  ?plot2 <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn2/containsSpecies> ?contains2 .
+  
+  ?contains2 <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn2/hasSpecies> ?sp2 ;  
+             <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn2/hasVolumeWithBarkInM3byHA> ?VCC2 .
+
+  ?sp3 <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/acceptedNameWithoutAuthor> ?name3 .
+  ?sp2 <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn2/acceptedNameWithoutAuthor> ?name2 .
+
+  # Filtrar para la diferencia de volumen mayor a 100 m3/ha en estos 9 años
+  FILTER ((?VCC3 - ?VCC2) > 100)
+
+  # Asegurarse de que las especies sean iguales
+  FILTER (?name2 = ?name3)
+  
+   # Estado de desarrollo fustal
+   FILTER (?desarrollo = <https://datos.iepnb.es/kos/sector-publico/medio-ambiente/ifn3/standDevelopment/state4>)
+
+}
+GROUP BY ?name2
+ORDER BY DESC(?count)
