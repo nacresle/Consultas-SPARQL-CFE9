@@ -1,4 +1,4 @@
-#Consulta 7. Consulta para identificar municipios y parcelas con árboles de mejor calidad (calidad 1 y 2) en una provincia y especie específica.
+#Consulta 7. Consulta para identificar municipios y parcelas con árboles de mejor calidad (calidad 1 y 2) en Asturias (33).
 
 SELECT DISTINCT ?muni ?plot3 ?lng ?lat (COUNT(?treeS) AS ?Sano)
 WHERE {
