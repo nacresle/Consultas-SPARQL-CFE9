@@ -1,4 +1,4 @@
-#Consulta 9. Caracteristicas del subpiso de matorral
+#Consulta 9. Caracteristicas del subpiso de matorral de las parcelas del IFN3 en Asturias (33)
 
 SELECT ?spM (COUNT(?plot3) AS ?countPlots)
 WHERE {
