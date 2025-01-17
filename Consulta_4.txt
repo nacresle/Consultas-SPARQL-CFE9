@@ -1,8 +1,8 @@
-Consulta 4. Consulta para obtener parcelas puras, aquellas donde una sola especie domina el 90% o más del área basal.
+Consulta 4. Consulta para obtener parcelas puras, aquellas donde una sola especie domina el 90% o más del área basal en Asturias (33).
 
 SELECT DISTINCT ?plot3 ?lat ?lng ?nameSp (100*?spBasalArea)/SUM(?G) AS ?PorG
 WHERE {
-  # Selecciona parcelas de IFN3 que contienen especies y están en un municipio específico.
+  # Selecciona parcelas de IFN3 que contienen especies 
   ?plot3 a <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/Plot> ;
          <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/containsSpecies> ?existencias ;
          <http://crossforest.eu/position/ontology/hasPosition> ?pos .
