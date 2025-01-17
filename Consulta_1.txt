@@ -1,4 +1,4 @@
-#Consulta 1. Daños en Pinus radiata en País Vasco
+#Consulta 1. Daños en Pinus radiata (28) en País Vasco
 
 SELECT DISTINCT ?plot3 
                 ?lat ?lng
