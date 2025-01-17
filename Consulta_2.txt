@@ -1,4 +1,4 @@
-#Consulta 2. Caracteristicas de las parcelas con daños en Pinus radiata en País Vasco
+#Consulta 2. Caracteristicas de las parcelas con daños en Pinus radiata (28) en País Vasco
 
 SELECT DISTINCT 
     ?plot3          # Parcela del IFN3
@@ -36,7 +36,7 @@ WHERE {
   # Relación con las especies y sus datos
   ?contains <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/hasSpecies> <https://datos.iepnb.es/kos/sector-publico/medio-ambiente/ifn3/taxon/Species28> ; # Especie específica
             <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/hasStandDevelopment> ?desarrollo .
-  ?contains2 <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/hasSpecies>    				        <https://datos.iepnb.es/kos/sector-publico/medio-ambiente/ifn3/taxon/Species28> ;
+  ?contains2 <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/hasSpecies> <https://datos.iepnb.es/kos/sector-publico/medio-ambiente/ifn3/taxon/Species28> ;
   <https://datos.iepnb.es/def/sector-publico/medio-ambiente/ifn3/hasVolumeWithBarkInM3byHA>  ?spVCC. 
 
   # Filtro para especificar los niveles de pedregosidad
